@@ -796,8 +796,8 @@ function createIndexer(def) {
 
 module.exports = createIndexer;
 
-}).call(this,_dereq_(34))
-},{"1":1,"26":26,"3":3,"34":34,"5":5}],3:[function(_dereq_,module,exports){
+}).call(this,_dereq_(32))
+},{"1":1,"26":26,"3":3,"32":32,"5":5}],3:[function(_dereq_,module,exports){
 'use strict';
 /*
  * Simple task queue to sequentialize actions. Assumes callbacks will eventually fire (once).
@@ -825,18 +825,18 @@ module.exports = TaskQueue;
 },{"5":5}],4:[function(_dereq_,module,exports){
 'use strict';
 
-var upsert = _dereq_(31).upsert;
+var upsert = _dereq_(30).upsert;
 
 module.exports = function (db, doc, diffFun) {
   return upsert.apply(db, [doc, diffFun]);
 };
-},{"31":31}],5:[function(_dereq_,module,exports){
+},{"30":30}],5:[function(_dereq_,module,exports){
 (function (process){
 'use strict';
 /* istanbul ignore if */
 exports.Promise = _dereq_(29);
 
-exports.inherits = _dereq_(23);
+exports.inherits = _dereq_(21);
 exports.extend = _dereq_(28);
 var argsarray = _dereq_(18);
 
@@ -926,19 +926,14 @@ exports.uniq = function (arr) {
   return output;
 };
 
-var crypto = _dereq_(19);
-var Md5 = _dereq_(35);
+var Md5 = _dereq_(33);
 
 exports.MD5 = function (string) {
   /* istanbul ignore else */
-  if (!process.browser) {
-    return crypto.createHash('md5').update(string).digest('hex');
-  } else {
-    return Md5.hash(string);
-  }
+  return Md5.hash(string);
 };
-}).call(this,_dereq_(34))
-},{"18":18,"19":19,"23":23,"28":28,"29":29,"34":34,"35":35}],6:[function(_dereq_,module,exports){
+}).call(this,_dereq_(32))
+},{"18":18,"21":21,"28":28,"29":29,"32":32,"33":33}],6:[function(_dereq_,module,exports){
 'use strict';
 
 var massageCreateIndexRequest = _dereq_(16);
@@ -1134,7 +1129,7 @@ module.exports = abstractMapper;
 var utils = _dereq_(17);
 var log = utils.log;
 
-var pouchUpsert = _dereq_(31);
+var pouchUpsert = _dereq_(30);
 var abstractMapper = _dereq_(7);
 var localUtils = _dereq_(15);
 var validateIndex = localUtils.validateIndex;
@@ -1216,7 +1211,7 @@ function createIndex(db, requestDef) {
 
 module.exports = createIndex;
 
-},{"15":15,"16":16,"17":17,"31":31,"7":7}],9:[function(_dereq_,module,exports){
+},{"15":15,"16":16,"17":17,"30":30,"7":7}],9:[function(_dereq_,module,exports){
 'use strict';
 
 var abstractMapper = _dereq_(7);
@@ -1263,7 +1258,7 @@ module.exports = deleteIndex;
 // "bar".
 //
 
-var isArray = _dereq_(24);
+var isArray = _dereq_(22);
 var collate = _dereq_(26).collate;
 var localUtils = _dereq_(15);
 var isCombinationalField = localUtils.isCombinationalField;
@@ -1539,7 +1534,7 @@ var matchers = {
 
 module.exports = filterInMemoryFields;
 
-},{"15":15,"17":17,"24":24,"26":26}],11:[function(_dereq_,module,exports){
+},{"15":15,"17":17,"22":22,"26":26}],11:[function(_dereq_,module,exports){
 'use strict';
 
 var utils = _dereq_(17);
@@ -2680,7 +2675,7 @@ exports.toPromise = function (func) {
   });
 };
 
-exports.inherits = _dereq_(23);
+exports.inherits = _dereq_(21);
 exports.Promise = Promise;
 
 exports.clone = function (obj) {
@@ -2711,16 +2706,11 @@ exports.promisedCallback = function (promise, callback) {
   return promise;
 };
 
-var crypto = _dereq_(19);
-var Md5 = _dereq_(35);
+var Md5 = _dereq_(33);
 
 exports.MD5 = function (string) {
   /* istanbul ignore else */
-  if (!process.browser) {
-    return crypto.createHash('md5').update(string).digest('hex');
-  } else {
-    return Md5.hash(string);
-  }
+  return Md5.hash(string);
 };
 
 exports.flatten = exports.getArguments(function (args) {
@@ -2890,10 +2880,10 @@ exports.uniq = function(arr) {
   });
 };
 
-exports.log = _dereq_(20)('pouchdb:find');
+exports.log = _dereq_(19)('pouchdb:find');
 
-}).call(this,_dereq_(34))
-},{"19":19,"20":20,"23":23,"28":28,"29":29,"34":34,"35":35}],18:[function(_dereq_,module,exports){
+}).call(this,_dereq_(32))
+},{"19":19,"21":21,"28":28,"29":29,"32":32,"33":33}],18:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = argsArray;
@@ -2914,16 +2904,14 @@ function argsArray(fun) {
   };
 }
 },{}],19:[function(_dereq_,module,exports){
-
-},{}],20:[function(_dereq_,module,exports){
-
+(function (process){
 /**
  * This is the web browser implementation of `debug()`.
  *
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = _dereq_(21);
+exports = module.exports = _dereq_(20);
 exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
@@ -2956,13 +2944,23 @@ exports.colors = [
  */
 
 function useColors() {
+  // NB: In an Electron preload script, document will be defined but not fully
+  // initialized. Since we know we're in Chrome, we'll just detect this case
+  // explicitly
+  if (typeof window !== 'undefined' && window && typeof window.process !== 'undefined' && window.process.type === 'renderer') {
+    return true;
+  }
+
   // is webkit? http://stackoverflow.com/a/16459606/376773
-  return ('WebkitAppearance' in document.documentElement.style) ||
+  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+  return (typeof document !== 'undefined' && document && 'WebkitAppearance' in document.documentElement.style) ||
     // is firebug? http://stackoverflow.com/a/398120/376773
-    (window.console && (console.firebug || (console.exception && console.table))) ||
+    (typeof window !== 'undefined' && window && window.console && (console.firebug || (console.exception && console.table))) ||
     // is firefox >= v31?
     // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
+    (typeof navigator !== 'undefined' && navigator && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
+    // double check webkit in userAgent just in case we are in a worker
+    (typeof navigator !== 'undefined' && navigator && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
 }
 
 /**
@@ -2970,7 +2968,11 @@ function useColors() {
  */
 
 exports.formatters.j = function(v) {
-  return JSON.stringify(v);
+  try {
+    return JSON.stringify(v);
+  } catch (err) {
+    return '[UnexpectedJSONParseError]: ' + err.message;
+  }
 };
 
 
@@ -2980,8 +2982,7 @@ exports.formatters.j = function(v) {
  * @api public
  */
 
-function formatArgs() {
-  var args = arguments;
+function formatArgs(args) {
   var useColors = this.useColors;
 
   args[0] = (useColors ? '%c' : '')
@@ -2991,17 +2992,17 @@ function formatArgs() {
     + (useColors ? '%c ' : ' ')
     + '+' + exports.humanize(this.diff);
 
-  if (!useColors) return args;
+  if (!useColors) return;
 
   var c = 'color: ' + this.color;
-  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
+  args.splice(1, 0, c, 'color: inherit')
 
   // the final "%c" is somewhat tricky, because there could be other
   // arguments passed either before or after the %c, so we need to
   // figure out the correct index to insert the CSS into
   var index = 0;
   var lastC = 0;
-  args[0].replace(/%[a-z%]/g, function(match) {
+  args[0].replace(/%[a-zA-Z%]/g, function(match) {
     if ('%%' === match) return;
     index++;
     if ('%c' === match) {
@@ -3012,7 +3013,6 @@ function formatArgs() {
   });
 
   args.splice(lastC, 0, c);
-  return args;
 }
 
 /**
@@ -3055,11 +3055,14 @@ function save(namespaces) {
  */
 
 function load() {
-  var r;
   try {
-    r = exports.storage.debug;
+    return exports.storage.debug;
   } catch(e) {}
-  return r;
+
+  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+  if (typeof process !== 'undefined' && 'env' in process) {
+    return process.env.DEBUG;
+  }
 }
 
 /**
@@ -3079,13 +3082,14 @@ exports.enable(load());
  * @api private
  */
 
-function localstorage(){
+function localstorage() {
   try {
     return window.localStorage;
   } catch (e) {}
 }
 
-},{"21":21}],21:[function(_dereq_,module,exports){
+}).call(this,_dereq_(32))
+},{"20":20,"32":32}],20:[function(_dereq_,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -3094,7 +3098,7 @@ function localstorage(){
  * Expose `debug()` as the module.
  */
 
-exports = module.exports = debug;
+exports = module.exports = createDebug.debug = createDebug["default"] = createDebug;
 exports.coerce = coerce;
 exports.disable = disable;
 exports.enable = enable;
@@ -3111,16 +3115,10 @@ exports.skips = [];
 /**
  * Map of special "%n" handling functions, for the debug "format" argument.
  *
- * Valid key names are a single, lowercased letter, i.e. "n".
+ * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
  */
 
 exports.formatters = {};
-
-/**
- * Previously assigned color.
- */
-
-var prevColor = 0;
 
 /**
  * Previous log timestamp.
@@ -3130,13 +3128,20 @@ var prevTime;
 
 /**
  * Select a color.
- *
+ * @param {String} namespace
  * @return {Number}
  * @api private
  */
 
-function selectColor() {
-  return exports.colors[prevColor++ % exports.colors.length];
+function selectColor(namespace) {
+  var hash = 0, i;
+
+  for (i in namespace) {
+    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  return exports.colors[Math.abs(hash) % exports.colors.length];
 }
 
 /**
@@ -3147,17 +3152,13 @@ function selectColor() {
  * @api public
  */
 
-function debug(namespace) {
+function createDebug(namespace) {
 
-  // define the `disabled` version
-  function disabled() {
-  }
-  disabled.enabled = false;
+  function debug() {
+    // disabled?
+    if (!debug.enabled) return;
 
-  // define the `enabled` version
-  function enabled() {
-
-    var self = enabled;
+    var self = debug;
 
     // set `diff` timestamp
     var curr = +new Date();
@@ -3167,22 +3168,22 @@ function debug(namespace) {
     self.curr = curr;
     prevTime = curr;
 
-    // add the `color` if not set
-    if (null == self.useColors) self.useColors = exports.useColors();
-    if (null == self.color && self.useColors) self.color = selectColor();
-
-    var args = Array.prototype.slice.call(arguments);
+    // turn the `arguments` into a proper Array
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
 
     args[0] = exports.coerce(args[0]);
 
     if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %o
-      args = ['%o'].concat(args);
+      // anything else let's inspect with %O
+      args.unshift('%O');
     }
 
     // apply any `formatters` transformations
     var index = 0;
-    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
+    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
       // if we encounter an escaped % then don't increase the array index
       if (match === '%%') return match;
       index++;
@@ -3198,19 +3199,24 @@ function debug(namespace) {
       return match;
     });
 
-    if ('function' === typeof exports.formatArgs) {
-      args = exports.formatArgs.apply(self, args);
-    }
-    var logFn = enabled.log || exports.log || console.log.bind(console);
+    // apply env-specific formatting (colors, etc.)
+    exports.formatArgs.call(self, args);
+
+    var logFn = debug.log || exports.log || console.log.bind(console);
     logFn.apply(self, args);
   }
-  enabled.enabled = true;
 
-  var fn = exports.enabled(namespace) ? enabled : disabled;
+  debug.namespace = namespace;
+  debug.enabled = exports.enabled(namespace);
+  debug.useColors = exports.useColors();
+  debug.color = selectColor(namespace);
 
-  fn.namespace = namespace;
+  // env-specific initialization logic for debug instances
+  if ('function' === typeof exports.init) {
+    exports.init(debug);
+  }
 
-  return fn;
+  return debug;
 }
 
 /**
@@ -3284,7 +3290,322 @@ function coerce(val) {
   return val;
 }
 
-},{"25":25}],22:[function(_dereq_,module,exports){
+},{"25":25}],21:[function(_dereq_,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],22:[function(_dereq_,module,exports){
+
+/**
+ * isArray
+ */
+
+var isArray = Array.isArray;
+
+/**
+ * toString
+ */
+
+var str = Object.prototype.toString;
+
+/**
+ * Whether or not the given `val`
+ * is an array.
+ *
+ * example:
+ *
+ *        isArray([]);
+ *        // > true
+ *        isArray(arguments);
+ *        // > false
+ *        isArray('');
+ *        // > false
+ *
+ * @param {mixed} val
+ * @return {bool}
+ */
+
+module.exports = isArray || function (val) {
+  return !! val && '[object Array]' == str.call(val);
+};
+
+},{}],23:[function(_dereq_,module,exports){
+'use strict';
+var immediate = _dereq_(24);
+
+/* istanbul ignore next */
+function INTERNAL() {}
+
+var handlers = {};
+
+var REJECTED = ['REJECTED'];
+var FULFILLED = ['FULFILLED'];
+var PENDING = ['PENDING'];
+
+module.exports = Promise;
+
+function Promise(resolver) {
+  if (typeof resolver !== 'function') {
+    throw new TypeError('resolver must be a function');
+  }
+  this.state = PENDING;
+  this.queue = [];
+  this.outcome = void 0;
+  if (resolver !== INTERNAL) {
+    safelyResolveThenable(this, resolver);
+  }
+}
+
+Promise.prototype["catch"] = function (onRejected) {
+  return this.then(null, onRejected);
+};
+Promise.prototype.then = function (onFulfilled, onRejected) {
+  if (typeof onFulfilled !== 'function' && this.state === FULFILLED ||
+    typeof onRejected !== 'function' && this.state === REJECTED) {
+    return this;
+  }
+  var promise = new this.constructor(INTERNAL);
+  if (this.state !== PENDING) {
+    var resolver = this.state === FULFILLED ? onFulfilled : onRejected;
+    unwrap(promise, resolver, this.outcome);
+  } else {
+    this.queue.push(new QueueItem(promise, onFulfilled, onRejected));
+  }
+
+  return promise;
+};
+function QueueItem(promise, onFulfilled, onRejected) {
+  this.promise = promise;
+  if (typeof onFulfilled === 'function') {
+    this.onFulfilled = onFulfilled;
+    this.callFulfilled = this.otherCallFulfilled;
+  }
+  if (typeof onRejected === 'function') {
+    this.onRejected = onRejected;
+    this.callRejected = this.otherCallRejected;
+  }
+}
+QueueItem.prototype.callFulfilled = function (value) {
+  handlers.resolve(this.promise, value);
+};
+QueueItem.prototype.otherCallFulfilled = function (value) {
+  unwrap(this.promise, this.onFulfilled, value);
+};
+QueueItem.prototype.callRejected = function (value) {
+  handlers.reject(this.promise, value);
+};
+QueueItem.prototype.otherCallRejected = function (value) {
+  unwrap(this.promise, this.onRejected, value);
+};
+
+function unwrap(promise, func, value) {
+  immediate(function () {
+    var returnValue;
+    try {
+      returnValue = func(value);
+    } catch (e) {
+      return handlers.reject(promise, e);
+    }
+    if (returnValue === promise) {
+      handlers.reject(promise, new TypeError('Cannot resolve promise with itself'));
+    } else {
+      handlers.resolve(promise, returnValue);
+    }
+  });
+}
+
+handlers.resolve = function (self, value) {
+  var result = tryCatch(getThen, value);
+  if (result.status === 'error') {
+    return handlers.reject(self, result.value);
+  }
+  var thenable = result.value;
+
+  if (thenable) {
+    safelyResolveThenable(self, thenable);
+  } else {
+    self.state = FULFILLED;
+    self.outcome = value;
+    var i = -1;
+    var len = self.queue.length;
+    while (++i < len) {
+      self.queue[i].callFulfilled(value);
+    }
+  }
+  return self;
+};
+handlers.reject = function (self, error) {
+  self.state = REJECTED;
+  self.outcome = error;
+  var i = -1;
+  var len = self.queue.length;
+  while (++i < len) {
+    self.queue[i].callRejected(error);
+  }
+  return self;
+};
+
+function getThen(obj) {
+  // Make sure we only access the accessor once as required by the spec
+  var then = obj && obj.then;
+  if (obj && typeof obj === 'object' && typeof then === 'function') {
+    return function appyThen() {
+      then.apply(obj, arguments);
+    };
+  }
+}
+
+function safelyResolveThenable(self, thenable) {
+  // Either fulfill, reject or reject with error
+  var called = false;
+  function onError(value) {
+    if (called) {
+      return;
+    }
+    called = true;
+    handlers.reject(self, value);
+  }
+
+  function onSuccess(value) {
+    if (called) {
+      return;
+    }
+    called = true;
+    handlers.resolve(self, value);
+  }
+
+  function tryToUnwrap() {
+    thenable(onSuccess, onError);
+  }
+
+  var result = tryCatch(tryToUnwrap);
+  if (result.status === 'error') {
+    onError(result.value);
+  }
+}
+
+function tryCatch(func, value) {
+  var out = {};
+  try {
+    out.value = func(value);
+    out.status = 'success';
+  } catch (e) {
+    out.status = 'error';
+    out.value = e;
+  }
+  return out;
+}
+
+Promise.resolve = resolve;
+function resolve(value) {
+  if (value instanceof this) {
+    return value;
+  }
+  return handlers.resolve(new this(INTERNAL), value);
+}
+
+Promise.reject = reject;
+function reject(reason) {
+  var promise = new this(INTERNAL);
+  return handlers.reject(promise, reason);
+}
+
+Promise.all = all;
+function all(iterable) {
+  var self = this;
+  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
+    return this.reject(new TypeError('must be an array'));
+  }
+
+  var len = iterable.length;
+  var called = false;
+  if (!len) {
+    return this.resolve([]);
+  }
+
+  var values = new Array(len);
+  var resolved = 0;
+  var i = -1;
+  var promise = new this(INTERNAL);
+
+  while (++i < len) {
+    allResolver(iterable[i], i);
+  }
+  return promise;
+  function allResolver(value, i) {
+    self.resolve(value).then(resolveFromAll, function (error) {
+      if (!called) {
+        called = true;
+        handlers.reject(promise, error);
+      }
+    });
+    function resolveFromAll(outValue) {
+      values[i] = outValue;
+      if (++resolved === len && !called) {
+        called = true;
+        handlers.resolve(promise, values);
+      }
+    }
+  }
+}
+
+Promise.race = race;
+function race(iterable) {
+  var self = this;
+  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
+    return this.reject(new TypeError('must be an array'));
+  }
+
+  var len = iterable.length;
+  var called = false;
+  if (!len) {
+    return this.resolve([]);
+  }
+
+  var i = -1;
+  var promise = new this(INTERNAL);
+
+  while (++i < len) {
+    resolver(iterable[i]);
+  }
+  return promise;
+  function resolver(value) {
+    self.resolve(value).then(function (response) {
+      if (!called) {
+        called = true;
+        handlers.resolve(promise, response);
+      }
+    }, function (error) {
+      if (!called) {
+        called = true;
+        handlers.reject(promise, error);
+      }
+    });
+  }
+}
+
+},{"24":24}],24:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
 var Mutation = global.MutationObserver || global.WebKitMutationObserver;
@@ -3357,76 +3678,16 @@ function immediate(task) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(_dereq_,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],24:[function(_dereq_,module,exports){
-
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
-};
-
 },{}],25:[function(_dereq_,module,exports){
 /**
  * Helpers.
  */
 
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
+var s = 1000
+var m = s * 60
+var h = m * 60
+var d = h * 24
+var y = d * 365.25
 
 /**
  * Parse or format the given `val`.
@@ -3437,17 +3698,23 @@ var y = d * 365.25;
  *
  * @param {String|Number} val
  * @param {Object} options
+ * @throws {Error} throw an error if val is not a non-empty string or a number
  * @return {String|Number}
  * @api public
  */
 
-module.exports = function(val, options){
-  options = options || {};
-  if ('string' == typeof val) return parse(val);
-  return options["long"]
-    ? long(val)
-    : short(val);
-};
+module.exports = function (val, options) {
+  options = options || {}
+  var type = typeof val
+  if (type === 'string' && val.length > 0) {
+    return parse(val)
+  } else if (type === 'number' && isNaN(val) === false) {
+    return options["long"] ?
+			fmtLong(val) :
+			fmtShort(val)
+  }
+  throw new Error('val is not a non-empty string or a valid number. val=' + JSON.stringify(val))
+}
 
 /**
  * Parse the given `str` and return milliseconds.
@@ -3458,47 +3725,53 @@ module.exports = function(val, options){
  */
 
 function parse(str) {
-  str = '' + str;
-  if (str.length > 10000) return;
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
-  if (!match) return;
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
+  str = String(str)
+  if (str.length > 10000) {
+    return
+  }
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str)
+  if (!match) {
+    return
+  }
+  var n = parseFloat(match[1])
+  var type = (match[2] || 'ms').toLowerCase()
   switch (type) {
     case 'years':
     case 'year':
     case 'yrs':
     case 'yr':
     case 'y':
-      return n * y;
+      return n * y
     case 'days':
     case 'day':
     case 'd':
-      return n * d;
+      return n * d
     case 'hours':
     case 'hour':
     case 'hrs':
     case 'hr':
     case 'h':
-      return n * h;
+      return n * h
     case 'minutes':
     case 'minute':
     case 'mins':
     case 'min':
     case 'm':
-      return n * m;
+      return n * m
     case 'seconds':
     case 'second':
     case 'secs':
     case 'sec':
     case 's':
-      return n * s;
+      return n * s
     case 'milliseconds':
     case 'millisecond':
     case 'msecs':
     case 'msec':
     case 'ms':
-      return n;
+      return n
+    default:
+      return undefined
   }
 }
 
@@ -3510,12 +3783,20 @@ function parse(str) {
  * @api private
  */
 
-function short(ms) {
-  if (ms >= d) return Math.round(ms / d) + 'd';
-  if (ms >= h) return Math.round(ms / h) + 'h';
-  if (ms >= m) return Math.round(ms / m) + 'm';
-  if (ms >= s) return Math.round(ms / s) + 's';
-  return ms + 'ms';
+function fmtShort(ms) {
+  if (ms >= d) {
+    return Math.round(ms / d) + 'd'
+  }
+  if (ms >= h) {
+    return Math.round(ms / h) + 'h'
+  }
+  if (ms >= m) {
+    return Math.round(ms / m) + 'm'
+  }
+  if (ms >= s) {
+    return Math.round(ms / s) + 's'
+  }
+  return ms + 'ms'
 }
 
 /**
@@ -3526,12 +3807,12 @@ function short(ms) {
  * @api private
  */
 
-function long(ms) {
-  return plural(ms, d, 'day')
-    || plural(ms, h, 'hour')
-    || plural(ms, m, 'minute')
-    || plural(ms, s, 'second')
-    || ms + ' ms';
+function fmtLong(ms) {
+  return plural(ms, d, 'day') ||
+    plural(ms, h, 'hour') ||
+    plural(ms, m, 'minute') ||
+    plural(ms, s, 'second') ||
+    ms + ' ms'
 }
 
 /**
@@ -3539,9 +3820,13 @@ function long(ms) {
  */
 
 function plural(ms, n, name) {
-  if (ms < n) return;
-  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
-  return Math.ceil(ms / n) + ' ' + name + 's';
+  if (ms < n) {
+    return
+  }
+  if (ms < n * 1.5) {
+    return Math.floor(ms / n) + ' ' + name
+  }
+  return Math.ceil(ms / n) + ' ' + name + 's'
 }
 
 },{}],26:[function(_dereq_,module,exports){
@@ -4156,271 +4441,16 @@ module.exports = extend;
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var lie = _interopDefault(_dereq_(30));
+var lie = _interopDefault(_dereq_(23));
 
 /* istanbul ignore next */
 var PouchPromise = typeof Promise === 'function' ? Promise : lie;
 
 module.exports = PouchPromise;
-},{"30":30}],30:[function(_dereq_,module,exports){
-'use strict';
-var immediate = _dereq_(22);
-
-/* istanbul ignore next */
-function INTERNAL() {}
-
-var handlers = {};
-
-var REJECTED = ['REJECTED'];
-var FULFILLED = ['FULFILLED'];
-var PENDING = ['PENDING'];
-
-module.exports = Promise;
-
-function Promise(resolver) {
-  if (typeof resolver !== 'function') {
-    throw new TypeError('resolver must be a function');
-  }
-  this.state = PENDING;
-  this.queue = [];
-  this.outcome = void 0;
-  if (resolver !== INTERNAL) {
-    safelyResolveThenable(this, resolver);
-  }
-}
-
-Promise.prototype["catch"] = function (onRejected) {
-  return this.then(null, onRejected);
-};
-Promise.prototype.then = function (onFulfilled, onRejected) {
-  if (typeof onFulfilled !== 'function' && this.state === FULFILLED ||
-    typeof onRejected !== 'function' && this.state === REJECTED) {
-    return this;
-  }
-  var promise = new this.constructor(INTERNAL);
-  if (this.state !== PENDING) {
-    var resolver = this.state === FULFILLED ? onFulfilled : onRejected;
-    unwrap(promise, resolver, this.outcome);
-  } else {
-    this.queue.push(new QueueItem(promise, onFulfilled, onRejected));
-  }
-
-  return promise;
-};
-function QueueItem(promise, onFulfilled, onRejected) {
-  this.promise = promise;
-  if (typeof onFulfilled === 'function') {
-    this.onFulfilled = onFulfilled;
-    this.callFulfilled = this.otherCallFulfilled;
-  }
-  if (typeof onRejected === 'function') {
-    this.onRejected = onRejected;
-    this.callRejected = this.otherCallRejected;
-  }
-}
-QueueItem.prototype.callFulfilled = function (value) {
-  handlers.resolve(this.promise, value);
-};
-QueueItem.prototype.otherCallFulfilled = function (value) {
-  unwrap(this.promise, this.onFulfilled, value);
-};
-QueueItem.prototype.callRejected = function (value) {
-  handlers.reject(this.promise, value);
-};
-QueueItem.prototype.otherCallRejected = function (value) {
-  unwrap(this.promise, this.onRejected, value);
-};
-
-function unwrap(promise, func, value) {
-  immediate(function () {
-    var returnValue;
-    try {
-      returnValue = func(value);
-    } catch (e) {
-      return handlers.reject(promise, e);
-    }
-    if (returnValue === promise) {
-      handlers.reject(promise, new TypeError('Cannot resolve promise with itself'));
-    } else {
-      handlers.resolve(promise, returnValue);
-    }
-  });
-}
-
-handlers.resolve = function (self, value) {
-  var result = tryCatch(getThen, value);
-  if (result.status === 'error') {
-    return handlers.reject(self, result.value);
-  }
-  var thenable = result.value;
-
-  if (thenable) {
-    safelyResolveThenable(self, thenable);
-  } else {
-    self.state = FULFILLED;
-    self.outcome = value;
-    var i = -1;
-    var len = self.queue.length;
-    while (++i < len) {
-      self.queue[i].callFulfilled(value);
-    }
-  }
-  return self;
-};
-handlers.reject = function (self, error) {
-  self.state = REJECTED;
-  self.outcome = error;
-  var i = -1;
-  var len = self.queue.length;
-  while (++i < len) {
-    self.queue[i].callRejected(error);
-  }
-  return self;
-};
-
-function getThen(obj) {
-  // Make sure we only access the accessor once as required by the spec
-  var then = obj && obj.then;
-  if (obj && typeof obj === 'object' && typeof then === 'function') {
-    return function appyThen() {
-      then.apply(obj, arguments);
-    };
-  }
-}
-
-function safelyResolveThenable(self, thenable) {
-  // Either fulfill, reject or reject with error
-  var called = false;
-  function onError(value) {
-    if (called) {
-      return;
-    }
-    called = true;
-    handlers.reject(self, value);
-  }
-
-  function onSuccess(value) {
-    if (called) {
-      return;
-    }
-    called = true;
-    handlers.resolve(self, value);
-  }
-
-  function tryToUnwrap() {
-    thenable(onSuccess, onError);
-  }
-
-  var result = tryCatch(tryToUnwrap);
-  if (result.status === 'error') {
-    onError(result.value);
-  }
-}
-
-function tryCatch(func, value) {
-  var out = {};
-  try {
-    out.value = func(value);
-    out.status = 'success';
-  } catch (e) {
-    out.status = 'error';
-    out.value = e;
-  }
-  return out;
-}
-
-Promise.resolve = resolve;
-function resolve(value) {
-  if (value instanceof this) {
-    return value;
-  }
-  return handlers.resolve(new this(INTERNAL), value);
-}
-
-Promise.reject = reject;
-function reject(reason) {
-  var promise = new this(INTERNAL);
-  return handlers.reject(promise, reason);
-}
-
-Promise.all = all;
-function all(iterable) {
-  var self = this;
-  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
-    return this.reject(new TypeError('must be an array'));
-  }
-
-  var len = iterable.length;
-  var called = false;
-  if (!len) {
-    return this.resolve([]);
-  }
-
-  var values = new Array(len);
-  var resolved = 0;
-  var i = -1;
-  var promise = new this(INTERNAL);
-
-  while (++i < len) {
-    allResolver(iterable[i], i);
-  }
-  return promise;
-  function allResolver(value, i) {
-    self.resolve(value).then(resolveFromAll, function (error) {
-      if (!called) {
-        called = true;
-        handlers.reject(promise, error);
-      }
-    });
-    function resolveFromAll(outValue) {
-      values[i] = outValue;
-      if (++resolved === len && !called) {
-        called = true;
-        handlers.resolve(promise, values);
-      }
-    }
-  }
-}
-
-Promise.race = race;
-function race(iterable) {
-  var self = this;
-  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
-    return this.reject(new TypeError('must be an array'));
-  }
-
-  var len = iterable.length;
-  var called = false;
-  if (!len) {
-    return this.resolve([]);
-  }
-
-  var i = -1;
-  var promise = new this(INTERNAL);
-
-  while (++i < len) {
-    resolver(iterable[i]);
-  }
-  return promise;
-  function resolver(value) {
-    self.resolve(value).then(function (response) {
-      if (!called) {
-        called = true;
-        handlers.resolve(promise, response);
-      }
-    }, function (error) {
-      if (!called) {
-        called = true;
-        handlers.reject(promise, error);
-      }
-    });
-  }
-}
-
-},{"22":22}],31:[function(_dereq_,module,exports){
+},{"23":23}],30:[function(_dereq_,module,exports){
 'use strict';
 
-var PouchPromise = _dereq_(33);
+var PouchPromise = _dereq_(31);
 
 // this is essentially the "update sugar" function from daleharvey/pouchdb#1388
 // the diffFun tells us what delta to apply to the doc.  it either returns
@@ -4512,14 +4542,98 @@ if (typeof window !== 'undefined' && window.PouchDB) {
   window.PouchDB.plugin(exports);
 }
 
-},{"33":33}],32:[function(_dereq_,module,exports){
-arguments[4][30][0].apply(exports,arguments)
-},{"22":22,"30":30}],33:[function(_dereq_,module,exports){
+},{"31":31}],31:[function(_dereq_,module,exports){
 arguments[4][29][0].apply(exports,arguments)
-},{"29":29,"32":32}],34:[function(_dereq_,module,exports){
+},{"23":23,"29":29}],32:[function(_dereq_,module,exports){
 // shim for using process in browser
-
 var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
 var queue = [];
 var draining = false;
 var currentQueue;
@@ -4544,7 +4658,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = setTimeout(cleanUpNextTick);
+    var timeout = runTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -4561,7 +4675,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    clearTimeout(timeout);
+    runClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -4573,7 +4687,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
+        runTimeout(drainQueue);
     }
 };
 
@@ -4612,10 +4726,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],35:[function(_dereq_,module,exports){
-/*jshint bitwise:false*/
-/*global unescape*/
-
+},{}],33:[function(_dereq_,module,exports){
 (function (factory) {
     if (typeof exports === 'object') {
         // Node/CommonJS
@@ -4626,6 +4737,7 @@ process.umask = function() { return 0; };
     } else {
         // Browser globals (with support for web workers)
         var glob;
+
         try {
             glob = window;
         } catch (e) {
@@ -4638,10 +4750,8 @@ process.umask = function() { return 0; };
 
     'use strict';
 
-    ////////////////////////////////////////////////////////////////////////////
-
     /*
-     * Fastest md5 implementation around (JKM md5)
+     * Fastest md5 implementation around (JKM md5).
      * Credits: Joseph Myers
      *
      * @see http://www.myersdaily.org/joseph/javascript/md5-text.html
@@ -4656,29 +4766,31 @@ process.umask = function() { return 0; };
     var add32 = function (a, b) {
         return (a + b) & 0xFFFFFFFF;
     },
+        hex_chr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
 
-    cmn = function (q, a, b, x, s, t) {
+
+    function cmn(q, a, b, x, s, t) {
         a = add32(add32(a, q), add32(x, t));
         return add32((a << s) | (a >>> (32 - s)), b);
-    },
+    }
 
-    ff = function (a, b, c, d, x, s, t) {
+    function ff(a, b, c, d, x, s, t) {
         return cmn((b & c) | ((~b) & d), a, b, x, s, t);
-    },
+    }
 
-    gg = function (a, b, c, d, x, s, t) {
+    function gg(a, b, c, d, x, s, t) {
         return cmn((b & d) | (c & (~d)), a, b, x, s, t);
-    },
+    }
 
-    hh = function (a, b, c, d, x, s, t) {
+    function hh(a, b, c, d, x, s, t) {
         return cmn(b ^ c ^ d, a, b, x, s, t);
-    },
+    }
 
-    ii = function (a, b, c, d, x, s, t) {
+    function ii(a, b, c, d, x, s, t) {
         return cmn(c ^ (b | (~d)), a, b, x, s, t);
-    },
+    }
 
-    md5cycle = function (x, k) {
+    function md5cycle(x, k) {
         var a = x[0],
             b = x[1],
             c = x[2],
@@ -4756,24 +4868,9 @@ process.umask = function() { return 0; };
         x[1] = add32(b, x[1]);
         x[2] = add32(c, x[2]);
         x[3] = add32(d, x[3]);
-    },
+    }
 
-    /* there needs to be support for Unicode here,
-       * unless we pretend that we can redefine the MD-5
-       * algorithm for multi-byte characters (perhaps
-       * by adding every four 16-bit characters and
-       * shortening the sum to 32 bits). Otherwise
-       * I suggest performing MD-5 as if every character
-       * was two bytes--e.g., 0040 0025 = @%--but then
-       * how will an ordinary MD-5 sum be matched?
-       * There is no way to standardize text to something
-       * like UTF-8 before transformation; speed cost is
-       * utterly prohibitive. The JavaScript standard
-       * itself needs to look at this: it should start
-       * providing access to strings as preformed UTF-8
-       * 8-bit unsigned value arrays.
-       */
-    md5blk = function (s) {
+    function md5blk(s) {
         var md5blks = [],
             i; /* Andy King said do it this way. */
 
@@ -4781,9 +4878,9 @@ process.umask = function() { return 0; };
             md5blks[i >> 2] = s.charCodeAt(i) + (s.charCodeAt(i + 1) << 8) + (s.charCodeAt(i + 2) << 16) + (s.charCodeAt(i + 3) << 24);
         }
         return md5blks;
-    },
+    }
 
-    md5blk_array = function (a) {
+    function md5blk_array(a) {
         var md5blks = [],
             i; /* Andy King said do it this way. */
 
@@ -4791,9 +4888,9 @@ process.umask = function() { return 0; };
             md5blks[i >> 2] = a[i] + (a[i + 1] << 8) + (a[i + 2] << 16) + (a[i + 3] << 24);
         }
         return md5blks;
-    },
+    }
 
-    md51 = function (s) {
+    function md51(s) {
         var n = s.length,
             state = [1732584193, -271733879, -1732584194, 271733878],
             i,
@@ -4831,9 +4928,9 @@ process.umask = function() { return 0; };
 
         md5cycle(state, tail);
         return state;
-    },
+    }
 
-    md51_array = function (a) {
+    function md51_array(a) {
         var n = a.length,
             state = [1732584193, -271733879, -1732584194, 271733878],
             i,
@@ -4879,49 +4976,27 @@ process.umask = function() { return 0; };
         md5cycle(state, tail);
 
         return state;
-    },
+    }
 
-    hex_chr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'],
-
-    rhex = function (n) {
+    function rhex(n) {
         var s = '',
             j;
         for (j = 0; j < 4; j += 1) {
             s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F];
         }
         return s;
-    },
+    }
 
-    hex = function (x) {
+    function hex(x) {
         var i;
         for (i = 0; i < x.length; i += 1) {
             x[i] = rhex(x[i]);
         }
         return x.join('');
-    },
-
-    md5 = function (s) {
-        return hex(md51(s));
-    },
-
-
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * SparkMD5 OOP implementation.
-     *
-     * Use this class to perform an incremental md5, otherwise use the
-     * static methods instead.
-     */
-    SparkMD5 = function () {
-        // call reset to init the instance
-        this.reset();
-    };
-
+    }
 
     // In some cases the fast add32 function cannot be used..
-    if (md5('hello') !== '5d41402abc4b2a76b9719d911017c592') {
+    if (hex(md51('hello')) !== '5d41402abc4b2a76b9719d911017c592') {
         add32 = function (x, y) {
             var lsw = (x & 0xFFFF) + (y & 0xFFFF),
                 msw = (x >> 16) + (y >> 16) + (lsw >> 16);
@@ -4929,6 +5004,120 @@ process.umask = function() { return 0; };
         };
     }
 
+    // ---------------------------------------------------
+
+    /**
+     * ArrayBuffer slice polyfill.
+     *
+     * @see https://github.com/ttaubert/node-arraybuffer-slice
+     */
+
+    if (typeof ArrayBuffer !== 'undefined' && !ArrayBuffer.prototype.slice) {
+        (function () {
+            function clamp(val, length) {
+                val = (val | 0) || 0;
+
+                if (val < 0) {
+                    return Math.max(val + length, 0);
+                }
+
+                return Math.min(val, length);
+            }
+
+            ArrayBuffer.prototype.slice = function (from, to) {
+                var length = this.byteLength,
+                    begin = clamp(from, length),
+                    end = length,
+                    num,
+                    target,
+                    targetArray,
+                    sourceArray;
+
+                if (to !== undefined) {
+                    end = clamp(to, length);
+                }
+
+                if (begin > end) {
+                    return new ArrayBuffer(0);
+                }
+
+                num = end - begin;
+                target = new ArrayBuffer(num);
+                targetArray = new Uint8Array(target);
+
+                sourceArray = new Uint8Array(this, begin, num);
+                targetArray.set(sourceArray);
+
+                return target;
+            };
+        })();
+    }
+
+    // ---------------------------------------------------
+
+    /**
+     * Helpers.
+     */
+
+    function toUtf8(str) {
+        if (/[\u0080-\uFFFF]/.test(str)) {
+            str = unescape(encodeURIComponent(str));
+        }
+
+        return str;
+    }
+
+    function utf8Str2ArrayBuffer(str, returnUInt8Array) {
+        var length = str.length,
+           buff = new ArrayBuffer(length),
+           arr = new Uint8Array(buff),
+           i;
+
+        for (i = 0; i < length; i += 1) {
+            arr[i] = str.charCodeAt(i);
+        }
+
+        return returnUInt8Array ? arr : buff;
+    }
+
+    function arrayBuffer2Utf8Str(buff) {
+        return String.fromCharCode.apply(null, new Uint8Array(buff));
+    }
+
+    function concatenateArrayBuffers(first, second, returnUInt8Array) {
+        var result = new Uint8Array(first.byteLength + second.byteLength);
+
+        result.set(new Uint8Array(first));
+        result.set(new Uint8Array(second), first.byteLength);
+
+        return returnUInt8Array ? result : result.buffer;
+    }
+
+    function hexToBinaryString(hex) {
+        var bytes = [],
+            length = hex.length,
+            x;
+
+        for (x = 0; x < length - 1; x += 2) {
+            bytes.push(parseInt(hex.substr(x, 2), 16));
+        }
+
+        return String.fromCharCode.apply(String, bytes);
+    }
+
+    // ---------------------------------------------------
+
+    /**
+     * SparkMD5 OOP implementation.
+     *
+     * Use this class to perform an incremental md5, otherwise use the
+     * static methods instead.
+     */
+
+    function SparkMD5() {
+        // call reset to init the instance
+        this.reset();
+    }
 
     /**
      * Appends a string.
@@ -4939,13 +5128,9 @@ process.umask = function() { return 0; };
      * @return {SparkMD5} The instance itself
      */
     SparkMD5.prototype.append = function (str) {
-        // converts the string to utf8 bytes if necessary
-        if (/[\u0080-\uFFFF]/.test(str)) {
-            str = unescape(encodeURIComponent(str));
-        }
-
-        // then append as binary
-        this.appendBinary(str);
+        // Converts the string to utf8 bytes if necessary
+        // Then append as binary
+        this.appendBinary(toUtf8(str));
 
         return this;
     };
@@ -4965,10 +5150,10 @@ process.umask = function() { return 0; };
             i;
 
         for (i = 64; i <= length; i += 64) {
-            md5cycle(this._state, md5blk(this._buff.substring(i - 64, i)));
+            md5cycle(this._hash, md5blk(this._buff.substring(i - 64, i)));
         }
 
-        this._buff = this._buff.substr(i - 64);
+        this._buff = this._buff.substring(i - 64);
 
         return this;
     };
@@ -4976,11 +5161,10 @@ process.umask = function() { return 0; };
     /**
      * Finishes the incremental computation, reseting the internal state and
      * returning the result.
-     * Use the raw parameter to obtain the raw result instead of the hex one.
      *
-     * @param {Boolean} raw True to get the raw result, false to get the hex result
+     * @param {Boolean} raw True to get the raw string, false to get the hex string
      *
-     * @return {String|Array} The result
+     * @return {String} The result
      */
     SparkMD5.prototype.end = function (raw) {
         var buff = this._buff,
@@ -4994,11 +5178,66 @@ process.umask = function() { return 0; };
         }
 
         this._finish(tail, length);
-        ret = !!raw ? this._state : hex(this._state);
+        ret = hex(this._hash);
+
+        if (raw) {
+            ret = hexToBinaryString(ret);
+        }
 
         this.reset();
 
         return ret;
+    };
+
+    /**
+     * Resets the internal state of the computation.
+     *
+     * @return {SparkMD5} The instance itself
+     */
+    SparkMD5.prototype.reset = function () {
+        this._buff = '';
+        this._length = 0;
+        this._hash = [1732584193, -271733879, -1732584194, 271733878];
+
+        return this;
+    };
+
+    /**
+     * Gets the internal state of the computation.
+     *
+     * @return {Object} The state
+     */
+    SparkMD5.prototype.getState = function () {
+        return {
+            buff: this._buff,
+            length: this._length,
+            hash: this._hash
+        };
+    };
+
+    /**
+     * Gets the internal state of the computation.
+     *
+     * @param {Object} state The state
+     *
+     * @return {SparkMD5} The instance itself
+     */
+    SparkMD5.prototype.setState = function (state) {
+        this._buff = state.buff;
+        this._length = state.length;
+        this._hash = state.hash;
+
+        return this;
+    };
+
+    /**
+     * Releases memory used by the incremental buffer and other additional
+     * resources. If you plan to use the instance again, use reset instead.
+     */
+    SparkMD5.prototype.destroy = function () {
+        delete this._hash;
+        delete this._buff;
+        delete this._length;
     };
 
     /**
@@ -5015,7 +5254,7 @@ process.umask = function() { return 0; };
 
         tail[i >> 2] |= 0x80 << ((i % 4) << 3);
         if (i > 55) {
-            md5cycle(this._state, tail);
+            md5cycle(this._hash, tail);
             for (i = 0; i < 16; i += 1) {
                 tail[i] = 0;
             }
@@ -5030,66 +5269,40 @@ process.umask = function() { return 0; };
 
         tail[14] = lo;
         tail[15] = hi;
-        md5cycle(this._state, tail);
+        md5cycle(this._hash, tail);
     };
-
-    /**
-     * Resets the internal state of the computation.
-     *
-     * @return {SparkMD5} The instance itself
-     */
-    SparkMD5.prototype.reset = function () {
-        this._buff = "";
-        this._length = 0;
-        this._state = [1732584193, -271733879, -1732584194, 271733878];
-
-        return this;
-    };
-
-    /**
-     * Releases memory used by the incremental buffer and other aditional
-     * resources. If you plan to use the instance again, use reset instead.
-     */
-    SparkMD5.prototype.destroy = function () {
-        delete this._state;
-        delete this._buff;
-        delete this._length;
-    };
-
 
     /**
      * Performs the md5 hash on a string.
      * A conversion will be applied if utf8 string is detected.
      *
      * @param {String}  str The string
-     * @param {Boolean} raw True to get the raw result, false to get the hex result
+     * @param {Boolean} raw True to get the raw string, false to get the hex string
      *
-     * @return {String|Array} The result
+     * @return {String} The result
      */
     SparkMD5.hash = function (str, raw) {
-        // converts the string to utf8 bytes if necessary
-        if (/[\u0080-\uFFFF]/.test(str)) {
-            str = unescape(encodeURIComponent(str));
-        }
-
-        var hash = md51(str);
-
-        return !!raw ? hash : hex(hash);
+        // Converts the string to utf8 bytes if necessary
+        // Then compute it using the binary function
+        return SparkMD5.hashBinary(toUtf8(str), raw);
     };
 
     /**
      * Performs the md5 hash on a binary string.
      *
      * @param {String}  content The binary string
-     * @param {Boolean} raw     True to get the raw result, false to get the hex result
+     * @param {Boolean} raw     True to get the raw string, false to get the hex string
      *
-     * @return {String|Array} The result
+     * @return {String} The result
      */
     SparkMD5.hashBinary = function (content, raw) {
-        var hash = md51(content);
+        var hash = md51(content),
+            ret = hex(hash);
 
-        return !!raw ? hash : hex(hash);
+        return raw ? hexToBinaryString(ret) : ret;
     };
+
+    // ---------------------------------------------------
 
     /**
      * SparkMD5 OOP implementation for array buffers.
@@ -5101,8 +5314,6 @@ process.umask = function() { return 0; };
         this.reset();
     };
 
-    ////////////////////////////////////////////////////////////////////////////
-
     /**
      * Appends an array buffer.
      *
@@ -5111,20 +5322,17 @@ process.umask = function() { return 0; };
      * @return {SparkMD5.ArrayBuffer} The instance itself
      */
     SparkMD5.ArrayBuffer.prototype.append = function (arr) {
-        // TODO: we could avoid the concatenation here but the algorithm would be more complex
-        //       if you find yourself needing extra performance, please make a PR.
-        var buff = this._concatArrayBuffer(this._buff, arr),
+        var buff = concatenateArrayBuffers(this._buff.buffer, arr, true),
             length = buff.length,
             i;
 
         this._length += arr.byteLength;
 
         for (i = 64; i <= length; i += 64) {
-            md5cycle(this._state, md5blk_array(buff.subarray(i - 64, i)));
+            md5cycle(this._hash, md5blk_array(buff.subarray(i - 64, i)));
         }
 
-        // Avoids IE10 weirdness (documented above)
-        this._buff = (i - 64) < length ? buff.subarray(i - 64) : new Uint8Array(0);
+        this._buff = (i - 64) < length ? new Uint8Array(buff.buffer.slice(i - 64)) : new Uint8Array(0);
 
         return this;
     };
@@ -5132,11 +5340,10 @@ process.umask = function() { return 0; };
     /**
      * Finishes the incremental computation, reseting the internal state and
      * returning the result.
-     * Use the raw parameter to obtain the raw result instead of the hex one.
      *
-     * @param {Boolean} raw True to get the raw result, false to get the hex result
+     * @param {Boolean} raw True to get the raw string, false to get the hex string
      *
-     * @return {String|Array} The result
+     * @return {String} The result
      */
     SparkMD5.ArrayBuffer.prototype.end = function (raw) {
         var buff = this._buff,
@@ -5150,14 +5357,16 @@ process.umask = function() { return 0; };
         }
 
         this._finish(tail, length);
-        ret = !!raw ? this._state : hex(this._state);
+        ret = hex(this._hash);
+
+        if (raw) {
+            ret = hexToBinaryString(ret);
+        }
 
         this.reset();
 
         return ret;
     };
-
-    SparkMD5.ArrayBuffer.prototype._finish = SparkMD5.prototype._finish;
 
     /**
      * Resets the internal state of the computation.
@@ -5167,53 +5376,62 @@ process.umask = function() { return 0; };
     SparkMD5.ArrayBuffer.prototype.reset = function () {
         this._buff = new Uint8Array(0);
         this._length = 0;
-        this._state = [1732584193, -271733879, -1732584194, 271733878];
+        this._hash = [1732584193, -271733879, -1732584194, 271733878];
 
         return this;
     };
 
     /**
-     * Releases memory used by the incremental buffer and other aditional
-     * resources. If you plan to use the instance again, use reset instead.
+     * Gets the internal state of the computation.
+     *
+     * @return {Object} The state
      */
-    SparkMD5.ArrayBuffer.prototype.destroy = SparkMD5.prototype.destroy;
+    SparkMD5.ArrayBuffer.prototype.getState = function () {
+        var state = SparkMD5.prototype.getState.call(this);
+
+        // Convert buffer to a string
+        state.buff = arrayBuffer2Utf8Str(state.buff);
+
+        return state;
+    };
 
     /**
-     * Concats two array buffers, returning a new one.
+     * Gets the internal state of the computation.
      *
-     * @param  {ArrayBuffer} first  The first array buffer
-     * @param  {ArrayBuffer} second The second array buffer
+     * @param {Object} state The state
      *
-     * @return {ArrayBuffer} The new array buffer
+     * @return {SparkMD5.ArrayBuffer} The instance itself
      */
-    SparkMD5.ArrayBuffer.prototype._concatArrayBuffer = function (first, second) {
-        var firstLength = first.length,
-            result = new Uint8Array(firstLength + second.byteLength);
+    SparkMD5.ArrayBuffer.prototype.setState = function (state) {
+        // Convert string to buffer
+        state.buff = utf8Str2ArrayBuffer(state.buff, true);
 
-        result.set(first);
-        result.set(new Uint8Array(second), firstLength);
-
-        return result;
+        return SparkMD5.prototype.setState.call(this, state);
     };
+
+    SparkMD5.ArrayBuffer.prototype.destroy = SparkMD5.prototype.destroy;
+
+    SparkMD5.ArrayBuffer.prototype._finish = SparkMD5.prototype._finish;
 
     /**
      * Performs the md5 hash on an array buffer.
      *
      * @param {ArrayBuffer} arr The array buffer
-     * @param {Boolean}     raw True to get the raw result, false to get the hex result
+     * @param {Boolean}     raw True to get the raw string, false to get the hex one
      *
-     * @return {String|Array} The result
+     * @return {String} The result
      */
     SparkMD5.ArrayBuffer.hash = function (arr, raw) {
-        var hash = md51_array(new Uint8Array(arr));
+        var hash = md51_array(new Uint8Array(arr)),
+            ret = hex(hash);
 
-        return !!raw ? hash : hex(hash);
+        return raw ? hexToBinaryString(ret) : ret;
     };
 
     return SparkMD5;
 }));
 
-},{}],36:[function(_dereq_,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 'use strict';
 
 var utils = _dereq_(17);
@@ -5274,5 +5492,5 @@ if (typeof window !== 'undefined' && window.PouchDB) {
   window.PouchDB.plugin(plugin);
 }
 
-},{"14":14,"17":17,"6":6}]},{},[36])(36)
+},{"14":14,"17":17,"6":6}]},{},[34])(34)
 });
